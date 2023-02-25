@@ -1,11 +1,11 @@
 //import types
 import {
-  QueryStatusResponse,
-  ExecuteQueryResponse,
-  QueryResult,
-  Row,
-  Rows,
   ExecutionState,
+  ExecuteQuery,
+  ExecutionStatusComplete,
+  ExecutionResults,
+  Rows,
+  Row,
 } from './types.ts';
 
 export class DuneAnalyticsProvider {
@@ -52,25 +52,25 @@ export class DuneAnalyticsProvider {
     }
   }
 
-  async executeNewQuery(queryId: number): Promise<ExecuteQueryResponse> {
-    const postResponse = await this.postApiData<ExecuteQueryResponse>(
+  async executeNewQuery(queryId: number): Promise<ExecuteQuery> {
+    const postResponse = await this.postApiData<ExecuteQuery>(
       `https://api.dune.com/api/v1/query/${queryId}/execute`
     );
-    return postResponse as ExecuteQueryResponse;
+    return postResponse as ExecuteQuery;
   }
 
-  async getStatus(executionId: string): Promise<QueryStatusResponse> {
-    const getResponse = await this.getApiData<QueryStatusResponse>(
+  async getStatus(executionId: string): Promise<ExecutionStatusComplete> {
+    const getResponse = await this.getApiData<ExecutionStatusComplete>(
       `https://api.dune.com/api/v1/execution/${executionId}/status`
     );
-    return getResponse as QueryStatusResponse;
+    return getResponse as ExecutionStatusComplete;
   }
 
-  async getResults(executionId: string): Promise<QueryResult> {
-    const getResponse = await this.getApiData<QueryResult>(
+  async getResults(executionId: string): Promise<ExecutionResults> {
+    const getResponse = await this.getApiData<ExecutionResults>(
       `https://api.dune.com/api/v1/execution/${executionId}/results`
     );
-    return getResponse as QueryResult;
+    return getResponse as ExecutionResults;
   }
 
   private async postApiData<T>(url: string): Promise<T> {

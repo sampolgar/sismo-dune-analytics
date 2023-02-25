@@ -8,30 +8,22 @@ export enum ExecutionState {
 }
 
 //response from 1st call /api/v1/query/2034748/execute
-export type ExecuteQueryResponse = {
+export type ExecuteQuery = {
   execution_id: string;
   state: ExecutionState;
 };
 
 //response from 2nd call /api/v1/execution/01GT5F65285F7SVED2SWJP2GP0/status
-export type ExecutionStatus = {
-  execution_id: string;
+export interface ExecutionStatus extends ExecuteQuery {
   query_id: number;
-  state: ExecutionState;
-  submitted_at: Date;
-  expires_at: Date;
-  execution_started_at: Date;
-};
-
-//response from 2nd call /api/v1/execution/01GT5F65285F7SVED2SWJP2GP0/status
-export interface QueryStatusResponse {
-  execution_id: string;
-  query_id: number;
-  state: ExecutionState;
   submitted_at: Date;
   expires_at: Date;
   execution_started_at: Date;
   execution_ended_at?: Date;
+}
+
+//response from 2nd call /api/v1/execution/01GT5F65285F7SVED2SWJP2GP0/status
+export interface ExecutionStatusComplete extends ExecutionStatus {
   result_metadata?: {
     column_names: string[];
     result_set_bytes: number;
@@ -43,13 +35,7 @@ export interface QueryStatusResponse {
 }
 
 //when execution status is completed
-export interface QueryResult {
-  execution_id: string;
-  query_id: number;
-  state: ExecutionState.COMPLETED;
-  submitted_at: Date;
-  expires_at: Date;
-  execution_started_at: Date;
+export interface ExecutionResults extends ExecutionStatus {
   execution_ended_at: Date;
   result: {
     metadata: {

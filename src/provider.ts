@@ -5,14 +5,8 @@ import {
   QueryResult,
   Row,
   Rows,
-  ExecutionFailedError,
+  ExecutionState,
 } from './types.ts';
-
-const stateErrorMap = {
-  QUERY_STATE_FAILED: ExecutionFailedError,
-  QUERY_STATE_EXPIRED: ExecutionFailedError,
-  QUERY_STATE_CANCELLED: ExecutionFailedError,
-};
 
 export class DuneAnalyticsProvider {
   apikey: string;
@@ -21,23 +15,21 @@ export class DuneAnalyticsProvider {
     this.apikey = apikey;
   }
 
-  //
-  async dune<T extends Rows>(queryId: number): Promise<Row[]> {
+  async dune(queryId: number): Promise<Row[]> {
     const { execution_id, state } = await this.executeNewQuery(queryId);
 
     console.log(
       `dune_execution_id is ${execution_id} intial state is ${state}`
     );
 
-    const finalState = await this.getExecutionStatus(execution_id);
-
-    console.log(`final state is ${finalState}`);
+    await this.getExecutionStatus(execution_id);
 
     const results = await this.getResults(execution_id);
+
     const { rows }: Rows = results.result;
+
     return rows;
   }
-
 
   async getExecutionStatus(executionId: string): Promise<string> {
     while (true) {
@@ -47,18 +39,19 @@ export class DuneAnalyticsProvider {
 
       console.log(`Current state is ${state}`);
 
-      if (state === 'QUERY_STATE_COMPLETED') {
+      if (state === ExecutionState.COMPLETED) {
         return state;
-      } else if (state in stateErrorMap) {
-        
-        const ErrorClass = stateErrorMap[state];
-        
-        throw new ErrorClass(state);
+      } else if (
+        state === ExecutionState.EXECUTING ||
+        state === ExecutionState.PENDING
+      ) {
+        continue;
+      } else {
+        throw new Error(state);
       }
     }
   }
 
-  
   async executeNewQuery(queryId: number): Promise<ExecuteQueryResponse> {
     const postResponse = await this.postApiData<ExecuteQueryResponse>(
       `https://api.dune.com/api/v1/query/${queryId}/execute`

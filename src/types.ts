@@ -75,13 +75,19 @@ export type ExecutionStatus = {
 //QUERY_STATE_EXECUTING;
 export type QueryResponse = {
   execution_id: string;
-  query_id: Number;
+  query_id: number;
   state: string;
   submitted_at: Date;
   expires_at: Date;
   execution_started_at: Date;
 };
 
+//number should be BigNumberIsh - changed for testing
+export type FetchedData = {
+  [address: string]: number;
+};
+
 //can change state to a type
 
 //https://dune.com/docs/api/api-reference/execution-results/#example-response
+// ): Promise<FetchedData> {

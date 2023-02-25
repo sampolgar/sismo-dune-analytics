@@ -1,5 +1,12 @@
 //import types
-import { QueryStatusResponse, ExecuteQueryResponse } from './types.ts';
+import {
+  QueryStatusResponse,
+  ExecuteQueryResponse,
+  QueryResult,
+  Row,
+  Rows,
+  FetchedData,
+} from './types.ts';
 
 export class DuneAnalyticsProvider {
   apikey: string;
@@ -9,21 +16,28 @@ export class DuneAnalyticsProvider {
   }
 
   // 1 refresh - const { execution_id: jobID } = await this.execute(queryID, parameters);
-  async dune(queryId: number): Promise<string> {
-    const { execution_id: initialDuneExecutionId, state: initialState } =
-      await this.postQuery(queryId);
+  async dune<T extends Rows>(queryId: number): Promise<Row[]> {
+    const { execution_id, state } = await this.postQuery(queryId);
     //check responses for errors
     console.log(
-      `dune_execution_id is ${initialDuneExecutionId} intial state is ${initialState}`
+      `dune_execution_id is ${execution_id} intial state is ${state}`
     );
-    // Check if the query is already completed
-    // if not, then keep polling it every 5 seconds
+
+    const finalState = await this.stateChecker(execution_id);
+
+    console.log(`final state is ${finalState}`);
+
+    const results = await this.getResults(execution_id);
+    const { rows }: Rows = results.result;
+    return rows;
+  }
+
+  async stateChecker(executionId: string): Promise<string> {
     while (true) {
       await new Promise((resolve) => setTimeout(resolve, 5000));
-      const { state, execution_id } = await this.getQuery(
-        initialDuneExecutionId
-      );
-      
+
+      const { state } = await this.getStatus(executionId);
+
       console.log(`Current state is ${state}`);
 
       if (state === 'QUERY_STATE_COMPLETED') {
@@ -41,11 +55,18 @@ export class DuneAnalyticsProvider {
     return postResponse as ExecuteQueryResponse;
   }
 
-  async getQuery(executionId: string): Promise<QueryStatusResponse> {
+  async getStatus(executionId: string): Promise<QueryStatusResponse> {
     const getResponse = await this.getCaller<QueryStatusResponse>(
       `https://api.dune.com/api/v1/execution/${executionId}/status`
     );
     return getResponse as QueryStatusResponse;
+  }
+
+  async getResults(executionId: string): Promise<QueryResult> {
+    const getResponse = await this.getCaller<QueryResult>(
+      `https://api.dune.com/api/v1/execution/${executionId}/results`
+    );
+    return getResponse as QueryResult;
   }
 
   // 3 make the post request, return the promise the handler

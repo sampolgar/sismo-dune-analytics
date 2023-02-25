@@ -1,10 +1,20 @@
+export class ExecutionFailedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ExecutionFailedError';
+  }
+}
+
 export interface QueryStatusResponse {
   execution_id: string;
   query_id: number;
   state:
     | 'QUERY_STATE_EXECUTING'
     | 'QUERY_STATE_PENDING'
-    | 'QUERY_STATE_COMPLETED';
+    | 'QUERY_STATE_COMPLETED'
+    | 'QUERY_STATE_FAILED'
+    | 'QUERY_STATE_EXPIRED'
+    | 'QUERY_STATE_CANCELLED';
   submitted_at: string;
   expires_at: string;
   execution_started_at: string;
@@ -28,17 +38,23 @@ export interface Rows {
   rows: Row[];
 }
 
+//dynamic Row type only interested in the address field
 export interface Row {
-  date: string;
-  nounid: number;
-  winner: string;
-  paid: number;
-  eth_price_usd: number;
-  ma_last_7_auction: number;
-  ma_last_30_auction: number;
-  url: string;
-  cumulative: number;
+  addressField: string;
+  [key: string]: any;
 }
+
+// export interface Row {
+//   date: string;
+//   nounid: number;
+//   Winner: string;
+//   paid: number;
+//   eth_price_usd: number;
+//   ma_last_7_auction: number;
+//   ma_last_30_auction: number;
+//   url: string;
+//   cumulative: number;
+// }
 
 export interface QueryResult {
   execution_id: string;

@@ -60,6 +60,10 @@ export interface Row {
   [key: string]: any;
 }
 
+export interface ExecutionError {
+  error: string;
+}
+
 //number should be BigNumberIsh - changed for testing
 export type FetchedData = {
   [address: string]: number;

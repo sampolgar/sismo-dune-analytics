@@ -9,12 +9,12 @@ const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
 
 // these are the variables that need changing
 const queryId = 2034748;
-const addressFieldName = 'Winner';
+const addressFieldName = 'Winner'; //
+const queryParameters = {}; //TODO add query parameters
 
-// const dunePost = await duneAnalyticsProvider.dune(queryId);
-const duneData: FetchedData = {};
-const rows = await duneAnalyticsProvider.dune(queryId);
+const duneData = await duneAnalyticsProvider.dune(queryId);
+const formattedData: FetchedData = {};
 
-for (const row of rows) {
-  duneData[row[addressFieldName]] = 1;
+for (const row of duneData) {
+  formattedData[row[addressFieldName]] = 1;
 }

@@ -11,11 +11,11 @@ import {
 export class DuneAnalyticsProvider {
   apikey: string;
 
-  constructor(apikey: string) {
+  public constructor(apikey: string) {
     this.apikey = apikey;
   }
 
-  async dune(queryId: number): Promise<Row[]> {
+  public async dune(queryId: number): Promise<Row[]> {
     const { execution_id, state } = await this.executeNewQuery(queryId);
 
     console.log(
@@ -33,7 +33,8 @@ export class DuneAnalyticsProvider {
 
   async getExecutionStatus(executionId: string): Promise<string> {
     while (true) {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      //TODO add a max timeout timer
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const { state } = await this.getStatus(executionId);
 
@@ -73,7 +74,7 @@ export class DuneAnalyticsProvider {
     return getResponse as ExecutionResults;
   }
 
-  private async postApiData<T>(url: string): Promise<T> {
+  async postApiData<T>(url: string): Promise<T> {
     const postCall = await fetch(url, {
       method: 'POST',
       headers: {
@@ -83,7 +84,7 @@ export class DuneAnalyticsProvider {
     return this.apiRequestHandler<T>(Promise.resolve(postCall));
   }
 
-  private async getApiData<T>(url: string): Promise<T> {
+  async getApiData<T>(url: string): Promise<T> {
     const getCall = await fetch(url, {
       method: 'GET',
       headers: {

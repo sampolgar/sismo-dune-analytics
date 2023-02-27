@@ -7,6 +7,9 @@ export enum ExecutionState {
   EXPIRED = 'QUERY_STATE_EXPIRED',
 }
 
+export type QueryParams = Record<string, string>;
+
+
 //response from 1st call /api/v1/query/2034748/execute
 export type ExecuteQuery = {
   execution_id: string;

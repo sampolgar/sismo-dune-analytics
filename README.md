@@ -27,3 +27,20 @@ This uses Deno as a runtime environment.
 2. add your Dune API key to the `.env` file
 3. ensure `"deno.enable": true` is set in your vscode workspace settings, example provided in `.vscode/settings.json`
 4. execute `deno run groupgenerator.ts`
+
+https://dune.com/docs/app/queries/parameters/#summary 
+## Error codes to catch
+
+- 429 - Too many requests
+### 400
+
+```json
+{
+  "error": "query parameter chain has invalid value fantom for type enum"
+}
+```
+
+
+## Dune Query Parameters
+[Dune Analytics Query Parameters](https://dune.com/docs/app/queries/parameters/) are a way to pass parameters to the Dune query.
+You'll need to copy the Query Parameter - represented by the `{{var}}` syntax from Dune and insert it into the query parameter object.

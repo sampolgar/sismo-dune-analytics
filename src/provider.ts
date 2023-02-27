@@ -53,6 +53,7 @@ export class DuneAnalyticsProvider {
     }
   }
 
+  //https://dune.com/docs/api/api-reference/execute-query-id/
   async executeNewQuery(queryId: number): Promise<ExecuteQuery> {
     const postResponse = await this.postApiData<ExecuteQuery>(
       `https://api.dune.com/api/v1/query/${queryId}/execute`
@@ -60,6 +61,7 @@ export class DuneAnalyticsProvider {
     return postResponse as ExecuteQuery;
   }
 
+  //https://dune.com/docs/api/api-reference/execution-status/
   async getStatus(executionId: string): Promise<ExecutionStatusComplete> {
     const getResponse = await this.getApiData<ExecutionStatusComplete>(
       `https://api.dune.com/api/v1/execution/${executionId}/status`
@@ -67,6 +69,7 @@ export class DuneAnalyticsProvider {
     return getResponse as ExecutionStatusComplete;
   }
 
+  //https://dune.com/docs/api/api-reference/execution-results/
   async getResults(executionId: string): Promise<ExecutionResults> {
     const getResponse = await this.getApiData<ExecutionResults>(
       `https://api.dune.com/api/v1/execution/${executionId}/results`

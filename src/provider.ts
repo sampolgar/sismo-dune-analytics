@@ -8,6 +8,7 @@ import {
   Rows,
   Row,
 } from './types.ts';
+import { DuneErrorFactory } from './errors.ts';
 
 export class DuneAnalyticsProvider {
   apikey: string;
@@ -116,20 +117,14 @@ export class DuneAnalyticsProvider {
         if (response.ok) {
           return response.json();
         } else {
-          console.log(
-            response,
-            response.status,
-            response.statusText,
-            'check the request URL and request parameters'
-          );
-          throw new Error(response.statusText);
+          throw DuneErrorFactory.createError(response.status, response.url);
         }
       })
       .catch((error) => {
-        throw new Error(`here 2: ${error}`);
+        throw DuneErrorFactory.createError(102, error as string);
       });
     if (apiResponse.error) {
-      throw new Error(`here 3: ${apiResponse.error}`);
+      throw DuneErrorFactory.createError(102, apiResponse.error as string);
     }
     return apiResponse;
   }

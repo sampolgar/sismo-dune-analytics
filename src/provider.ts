@@ -61,7 +61,6 @@ export class DuneAnalyticsProvider {
     }
   }
 
-  //https://dune.com/docs/api/api-reference/execute-query-id/
   async executeNewQuery(
     queryId: number,
     queryParams?: QueryParams
@@ -73,7 +72,6 @@ export class DuneAnalyticsProvider {
     return postResponse as ExecuteQuery;
   }
 
-  //https://dune.com/docs/api/api-reference/execution-status/
   async getStatus(executionId: string): Promise<ExecutionStatusComplete> {
     const getResponse = await this.getApiData<ExecutionStatusComplete>(
       `https://api.dune.com/api/v1/execution/${executionId}/status`
@@ -81,7 +79,6 @@ export class DuneAnalyticsProvider {
     return getResponse as ExecutionStatusComplete;
   }
 
-  //https://dune.com/docs/api/api-reference/execution-results/
   async getResults(executionId: string): Promise<ExecutionResults> {
     const getResponse = await this.getApiData<ExecutionResults>(
       `https://api.dune.com/api/v1/execution/${executionId}/results`
@@ -121,10 +118,11 @@ export class DuneAnalyticsProvider {
         }
       })
       .catch((error) => {
-        throw DuneErrorFactory.createError(102, error as string);
+        console.log(error);
       });
     if (apiResponse.error) {
-      throw DuneErrorFactory.createError(102, apiResponse.error as string);
+      console.log(apiResponse.error);
+      // throw DuneErrorFactory.createError(102, apiResponse.error as string);
     }
     return apiResponse;
   }

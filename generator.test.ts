@@ -1,11 +1,5 @@
 //Deno test cases using assertions https://deno.land/manual@v1.31.1/basics/testing/assertions
-import {
-  assertArrayIncludes,
-  assertEquals,
-  assertMatch,
-  assertNotMatch,
-  assertObjectMatch,
-} from 'https://deno.land/std@0.178.0/testing/asserts.ts';
+import * as mod from 'https://deno.land/std@0.178.0/testing/asserts.ts';
 import { load } from 'https://deno.land/std/dotenv/mod.ts';
 import { DuneAnalyticsProvider } from './src/index.ts';
 import { FetchedData, QueryParams } from './src/types.ts';
@@ -16,12 +10,6 @@ import { DuneErrorFactory } from './src/errors.ts';
 */
 //https://dune.com/queries/2034748
 Deno.test('successful query no query params', async () => {
-  const expectedResults: FetchedData = {
-    '0x2536c09e5f5691498805884fa37811be3b2bddb4': 1,
-    '0xae7f458667f1b30746354abc3157907d9f6fd15e': 1,
-    '0xeb1c22baacafac7836f20f684c946228401ff01c': 1,
-    '0x68f9d801c96ac6ccf562f3600cef77c4504449b6': 1,
-  };
   const queryId = 2034748;
   const addressFieldName = 'Winner';
   const queryParameters: QueryParams = {};
@@ -30,7 +18,15 @@ Deno.test('successful query no query params', async () => {
     addressFieldName,
     queryParameters
   );
-  assertEquals(formattedData, expectedResults);
+
+  const expectedResults: FetchedData = {
+    '0x2536c09e5f5691498805884fa37811be3b2bddb4': 1,
+    '0xae7f458667f1b30746354abc3157907d9f6fd15e': 1,
+    '0xeb1c22baacafac7836f20f684c946228401ff01c': 1,
+    '0x68f9d801c96ac6ccf562f3600cef77c4504449b6': 1,
+  };
+
+  mod.assertEquals(formattedData, expectedResults);
 });
 
 //https://dune.com/queries/1618116?address_t6c1ea=0x3CAaE25Ee616f2C8E13C74dA0813402eae3F496b&chain_e15077=arbitrum
@@ -51,9 +47,8 @@ Deno.test('successful query with query params', async () => {
   const expectedResults: FetchedData = {
     '0x3caae25ee616f2c8e13c74da0813402eae3f496b': 1,
   };
-  assertObjectMatch(formattedData, expectedResults);
+  mod.assertObjectMatch(formattedData, expectedResults);
 });
-
 
 /*
 Now we test for the below cases
@@ -71,24 +66,25 @@ Now we test for the below cases
 - massive query
 */
 
-Deno.test('successful query with query params', async () => {
-  const queryId = 1618116;
-  const addressFieldName = 'holder';
-  const queryParameters: QueryParams = {
-    address: '0x3CAaE25Ee616f2C8E13C74dA0813402eae3F496b',
-    blocknumber: '66257668',
-    chain: 'arbitrum',
-  };
-  const formattedData = await runQuery(
-    queryId,
-    addressFieldName,
-    queryParameters
+//wrong dune api key
+Deno.test('wrong dune api key', () => {
+  mod.assertThrows(
+    () => {
+      runQuery(2034748, 'Winner', {}, 'wrongduneapikey');
+    },
+    Error,
+    '401 - Unauthorized, check your Dune API key'
   );
+});
 
-  const expectedResults: FetchedData = {
-    '0x3caae25ee616f2c8e13c74da0813402eae3f496b': 1,
-  };
-  assertObjectMatch(formattedData, expectedResults);
+Deno.test('Test Assert Throws', () => {
+  mod.assertThrows(
+    () => {
+      throw DuneErrorFactory.createError(401);
+    },
+    Error,
+    '401 - Unauthorized, check your Dune API key'
+  );
 });
 
 async function runQuery(
@@ -98,10 +94,12 @@ async function runQuery(
   t?: any
 ): Promise<FetchedData> {
   const env = await load();
-  const DUNE_API_KEY = env['DUNE_API_KEY'] || '';
+  console.log(t);
+  const DUNE_API_KEY = t || env['DUNE_API_KEY'];
   const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
 
   const formattedData: FetchedData = {};
+
   try {
     const duneData = await duneAnalyticsProvider.dune(queryId, queryParameters);
     for (const row of duneData) {
@@ -109,31 +107,8 @@ async function runQuery(
     }
     if (formattedData.undefined) throw DuneErrorFactory.createError(101);
   } catch (error) {
-    console.log(error);
+    console.log(`here i am`);
+    throw DuneErrorFactory.createError(error.status, error.url);
   }
   return formattedData;
 }
-
-Deno.test('Test Assert Array Contains', () => {
-  assertArrayIncludes([1, 2, 3], [1]);
-  assertArrayIncludes([1, 2, 3], [1, 2]);
-  assertArrayIncludes(Array.from('Hello World'), Array.from('Hello'));
-});
-
-const expectedResults: FetchedData = {
-  '0x2536c09e5f5691498805884fa37811be3b2bddb4': 1,
-  '0xae7f458667f1b30746354abc3157907d9f6fd15e': 1,
-  '0xeb1c22baacafac7836f20f684c946228401ff01c': 1,
-  '0x68f9d801c96ac6ccf562f3600cef77c4504449b6': 1,
-};
-
-const myResult: FetchedData = {
-  '0xae7f458667f1b30746354abc3157907d9f6fd15e': 1,
-};
-
-Deno.test('Test Object Contains', () => {
-  assertObjectMatch(expectedResults, myResult);
-});
-
-//tests - failure
-

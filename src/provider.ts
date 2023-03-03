@@ -7,6 +7,7 @@ import {
   ExecutionResults,
   Rows,
   Row,
+  // ErrorDictionary,
 } from './types.ts';
 import { DuneErrorFactory } from './errors.ts';
 
@@ -46,6 +47,7 @@ export class DuneAnalyticsProvider {
 
       const { state } = await this.getStatus(executionId);
 
+      //TODO add timer to log to show how long execution is taking
       console.log(`Current state is ${state}`);
 
       if (state === ExecutionState.COMPLETED) {
@@ -95,7 +97,7 @@ export class DuneAnalyticsProvider {
       },
       body: JSON.stringify({ query_parameters: queryParams || {} }),
     });
-    return this.apiRequestHandler<T>(Promise.resolve(postCall));
+    return this.apiRequestHandler<T>(postCall);
   }
 
   async getApiData<T>(url: string): Promise<T> {
@@ -105,7 +107,7 @@ export class DuneAnalyticsProvider {
         'x-dune-api-key': this.apikey,
       },
     });
-    return this.apiRequestHandler<T>(Promise.resolve(getCall));
+    return this.apiRequestHandler<T>(getCall);
   }
 
   async apiRequestHandler<T>(responsePromise: Promise<Response>): Promise<T> {
@@ -113,16 +115,15 @@ export class DuneAnalyticsProvider {
       .then((response) => {
         if (response.ok) {
           return response.json();
-        } else {
-          throw DuneErrorFactory.createError(response.status, response.url);
         }
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((e) => {
+        console.log(`e ----------->>>>>>${e}`);
+        throw DuneErrorFactory.createError(e.response.status, e.response.url);
       });
+
     if (apiResponse.error) {
-      console.log(apiResponse.error);
-      // throw DuneErrorFactory.createError(102, apiResponse.error as string);
+      throw DuneErrorFactory.createError(102, apiResponse.error as string);
     }
     return apiResponse;
   }

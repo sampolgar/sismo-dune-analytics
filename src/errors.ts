@@ -17,8 +17,8 @@ export class DuneErrorFactory {
         '400 - Bad request, check your Dune request URL and query parameters. Your query parameter keys must match your Dune Query',
       ],
       [401, '401 - Unauthorized, check your Dune API key'],
-      [403, '403 - Forbidden, Check your Dune queryId'],
-      [404, '404 - Not found'],
+      [403, '403 - Forbidden, check your Dune queryId'],
+      [404, '404 - Not found, check your Dune queryId'],
       [500, '500 - Internal server error'],
       [503, '503 - Service unavailable'],
       [

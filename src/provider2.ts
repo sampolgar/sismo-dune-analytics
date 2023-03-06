@@ -23,14 +23,6 @@ export class DuneAnalyticsProvider2 {
   ): Promise<T | string> {
     const apiPromise = await this.executeNewQuery(queryId, queryParams);
     const response = await apiPromise;
-    const { execution_id = '', state = '', error = '' } = apiPromise;
-    if (error) {
-      console.log(`error is ${error}`);
-      return error;
-    } else {
-      return { execution_id: execution_id, state: state } as T;
-    }
-
     // const status: ExecutionState = { execution_id: execution_id, state: state };
 
     // return status;
@@ -59,21 +51,40 @@ export class DuneAnalyticsProvider2 {
     return this.apiRequestHandler<T>(postResponse);
   }
 
-  async apiRequestHandler<T>(responsePromise: Promise<Response>): Promise<T> {
+  private async apiRequestHandler<T>(
+    responsePromise: Promise<Response>
+  ): Promise<T> {
     const apiResponse = await responsePromise
       .then((response) => {
-        if (response.ok) {
-          return response.json();
+        if (!response.ok) {
+          throw DuneErrorFactory.createError(response.status, response.url);
         }
+        return response.json();
       })
-      .catch((e) => {
-        console.log(`e ----------->>>>>>${e}`);
-        throw DuneErrorFactory.createError(e.response.status, e.response.url);
+      .catch((error) => {
+        throw error;
       });
-    // console.log(`apiResponse ----------->>>>>>${JSON.stringify(apiResponse)}`);
-    // if (apiResponse.error) {
-    //   throw DuneErrorFactory.createError(102, apiResponse.error as string);
-    // }
+    if (apiResponse.error) {
+      throw DuneErrorFactory.createError(102, apiResponse.error as string);
+    }
     return apiResponse;
   }
+
+  // async apiRequestHandler<T>(responsePromise: Promise<Response>): Promise<T> {
+  //   const apiResponse = await responsePromise
+  //     .then((response) => {
+  //       if (response.ok) {
+  //         return response.json();
+  //       }
+  //     })
+  //     .catch((e) => {
+  //       console.log(`e ----------->>>>>>${e}`);
+  //       throw DuneErrorFactory.createError(e.response.status, e.response.url);
+  //     });
+  //   // console.log(`apiResponse ----------->>>>>>${JSON.stringify(apiResponse)}`);
+  //   // if (apiResponse.error) {
+  //   //   throw DuneErrorFactory.createError(102, apiResponse.error as string);
+  //   // }
+  //   return apiResponse;
+  // }
 }

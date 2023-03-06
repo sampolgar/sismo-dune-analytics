@@ -15,9 +15,8 @@ export type QueryParams = Record<string, string>;
 
 //response from 1st call /api/v1/query/2034748/execute
 export type ExecuteQuery = {
-  execution_id?: string;
-  state?: ExecutionState;
-  error?: string;
+  execution_id: string;
+  state: ExecutionState;
 };
 
 //response from 2nd call /api/v1/execution/{{executionid}}/status

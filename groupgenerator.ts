@@ -15,10 +15,13 @@ const queryParameters: QueryParams = {};
 const formattedData: FetchedData = {};
 
 const duneData = await duneAnalyticsProvider
-  .dune(queryId, queryParameters)
-  .catch(handleError);
-
-console.log(duneData);
+  .executeNewQuery(queryId, queryParameters)
+  .then((data) => {
+    console.log(`here with the data! ${JSON.stringify(data)}`);
+  })
+  .catch((e) => {
+    console.log(`here with the error! ${e}`);
+  });
 
 // for (const row of duneData) {
 //   formattedData[row[addressFieldName]] = 1;

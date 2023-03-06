@@ -91,14 +91,14 @@ export class DuneAnalyticsProvider {
 
   async postApiData<T>(url: string, queryParams?: QueryParams): Promise<T> {
     console.log(`posting to ${url} with ${JSON.stringify(queryParams)}`);
-    const postCall = await fetch(url, {
+    const postResponse = fetch(url, {
       method: 'POST',
       headers: {
         'x-dune-api-key': this.apikey,
       },
       body: JSON.stringify({ query_parameters: queryParams || {} }),
     });
-    return this.apiRequestHandler<T>(Promise.resolve(postCall));
+    return this.apiRequestHandler<T>(postResponse);
   }
 
   async getApiData<T>(url: string): Promise<T> {
@@ -114,18 +114,17 @@ export class DuneAnalyticsProvider {
   async apiRequestHandler<T>(responsePromise: Promise<Response>): Promise<T> {
     const apiResponse = await responsePromise
       .then((response) => {
-        if (response.ok) {
-          return response.json();
+        if (!response.ok) {
+          throw DuneErrorFactory.createError(response.status, response.url);
         }
+        return response.json();
       })
-      .catch((e) => {
-        console.log(`e ----------->>>>>>${e}`);
-        throw DuneErrorFactory.createError(e.response.status, e.response.url);
+      .catch((error) => {
+        throw error;
       });
-    console.log(`apiResponse ----------->>>>>>${JSON.stringify(apiResponse)}`);
-    // if (apiResponse.error) {
-    //   throw DuneErrorFactory.createError(102, apiResponse.error as string);
-    // }
+    if (apiResponse.error) {
+      throw DuneErrorFactory.createError(101, apiResponse.error as string);
+    }
     return apiResponse;
   }
 }

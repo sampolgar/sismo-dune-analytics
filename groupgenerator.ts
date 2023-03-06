@@ -14,10 +14,19 @@ const addressFieldName = 'Winner';
 const queryParameters: QueryParams = {};
 const formattedData: FetchedData = {};
 
-const duneData = await duneAnalyticsProvider.dune(queryId, queryParameters);
+const duneData = await duneAnalyticsProvider
+  .dune(queryId, queryParameters)
+  .catch(handleError);
 
-for (const row of duneData) {
-  formattedData[row[addressFieldName]] = 1;
-}
+console.log(duneData);
+
+// for (const row of duneData) {
+//   formattedData[row[addressFieldName]] = 1;
+// }
 
 console.log(`formattedData: ${JSON.stringify(formattedData)}`);
+
+function handleError(err: Error) {
+  console.log('Oh noooo!');
+  console.log(err);
+}

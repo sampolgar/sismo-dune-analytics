@@ -18,7 +18,6 @@ export class DuneAnalyticsProvider {
     this.apikey = apikey;
   }
 
-
   //we want 3 options
   public async dune(
     queryId: number,

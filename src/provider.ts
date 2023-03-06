@@ -18,6 +18,8 @@ export class DuneAnalyticsProvider {
     this.apikey = apikey;
   }
 
+
+  //we want 3 options
   public async dune(
     queryId: number,
     queryParams?: QueryParams
@@ -97,7 +99,7 @@ export class DuneAnalyticsProvider {
       },
       body: JSON.stringify({ query_parameters: queryParams || {} }),
     });
-    return this.apiRequestHandler<T>(postCall);
+    return this.apiRequestHandler<T>(Promise.resolve(postCall));
   }
 
   async getApiData<T>(url: string): Promise<T> {
@@ -107,7 +109,7 @@ export class DuneAnalyticsProvider {
         'x-dune-api-key': this.apikey,
       },
     });
-    return this.apiRequestHandler<T>(getCall);
+    return this.apiRequestHandler<T>(Promise.resolve(getCall));
   }
 
   async apiRequestHandler<T>(responsePromise: Promise<Response>): Promise<T> {
@@ -121,10 +123,10 @@ export class DuneAnalyticsProvider {
         console.log(`e ----------->>>>>>${e}`);
         throw DuneErrorFactory.createError(e.response.status, e.response.url);
       });
-
-    if (apiResponse.error) {
-      throw DuneErrorFactory.createError(102, apiResponse.error as string);
-    }
+    console.log(`apiResponse ----------->>>>>>${JSON.stringify(apiResponse)}`);
+    // if (apiResponse.error) {
+    //   throw DuneErrorFactory.createError(102, apiResponse.error as string);
+    // }
     return apiResponse;
   }
 }

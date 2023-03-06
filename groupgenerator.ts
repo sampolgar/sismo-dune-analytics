@@ -10,26 +10,28 @@ const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
 
 // these are the variables that need changing
 const queryId = 2034748; //2034748 nouns  //1215383 cow
-const addressFieldName = 'Winner';
 const queryParameters: QueryParams = {};
-const formattedData: FetchedData = {};
 
-const duneData = await duneAnalyticsProvider
-  .executeNewQuery(queryId, queryParameters)
-  .then((data) => {
-    console.log(`here with the data! ${JSON.stringify(data)}`);
-  })
-  .catch((e) => {
-    console.log(`here with the error! ${e}`);
-  });
+async function getDuneData() {
+  const dailyAuctionData = await duneAnalyticsProvider.executeQuery(
+    queryId,
+    queryParameters
+  );
 
-// for (const row of duneData) {
-//   formattedData[row[addressFieldName]] = 1;
-// }
+  const duneEthAddressColumn = 'Winner 1';
+  const formattedData: FetchedData = {};
 
-console.log(`formattedData: ${JSON.stringify(formattedData)}`);
+  for (const row of dailyAuctionData) {
+    formattedData[row[duneEthAddressColumn]] = 1;
+  }
 
-function handleError(err: Error) {
-  console.log('Oh noooo!');
-  console.log(err);
+  if (formattedData.undefined) {
+    throw DuneErrorFactory.createError(102);
+  }
+
+  console.log(`formattedData: ${JSON.stringify(formattedData)}`);
 }
+
+getDuneData().catch((e) => {
+  console.log(`here with the error! ${e}`);
+});

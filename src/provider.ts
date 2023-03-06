@@ -19,7 +19,7 @@ export class DuneAnalyticsProvider {
   }
 
   //we want 3 options
-  public async dune(
+  public async executeQuery(
     queryId: number,
     queryParams?: QueryParams
   ): Promise<Row[]> {

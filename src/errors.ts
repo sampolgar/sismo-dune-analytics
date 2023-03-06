@@ -25,6 +25,10 @@ export class DuneErrorFactory {
         101,
         'Custom error - No data returned from Dune Analytics. Check the address field matches the address field in Dune. The address field in Dune must not have a space e.g. ETH Address. If so, rename it to ETH_Address or ETHAddress',
       ],
+      [
+        102,
+        'Check the eth address field matches the eth address field in Dune.',
+      ],
     ]);
     return errorMap.get(statusCode) || 'Unknown error';
   }

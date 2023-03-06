@@ -9,13 +9,11 @@ export enum ExecutionState {
 
 export type QueryParams = Record<string, string>;
 
-//response from 1st call /api/v1/query/2034748/execute
 export type ExecuteQuery = {
   execution_id: string;
   state: ExecutionState;
 };
 
-//response from 2nd call /api/v1/execution/{{executionid}}/status
 export interface ExecutionStatus extends ExecuteQuery {
   query_id: number;
   submitted_at: Date;
@@ -24,7 +22,6 @@ export interface ExecutionStatus extends ExecuteQuery {
   execution_ended_at?: Date;
 }
 
-//response from 2nd call /api/v1/execution/{{executionid}}/status
 export interface ExecutionStatusComplete extends ExecutionStatus {
   result_metadata?: {
     column_names: string[];
@@ -36,7 +33,6 @@ export interface ExecutionStatusComplete extends ExecutionStatus {
   };
 }
 
-//when execution status is completed /api/v1/execution/{{executionid}}/results
 export interface ExecutionResults extends ExecutionStatus {
   execution_ended_at: Date;
   result: {

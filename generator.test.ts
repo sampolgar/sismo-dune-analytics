@@ -70,7 +70,9 @@ Now we test for the below cases
 Deno.test('wrong dune api key', () => {
   mod.assertThrows(
     () => {
-      runQuery(2034748, 'Winner', {}, 'wrongduneapikey');
+      runQuery(2034748, 'Winner', {}, 'wrongduneapikey').then((data) => {
+        console.log(data);
+      });
     },
     Error,
     '401 - Unauthorized, check your Dune API key'
@@ -87,28 +89,68 @@ Deno.test('Test Assert Throws', () => {
   );
 });
 
-async function runQuery(
-  queryId: number,
-  addressFieldName: string,
-  queryParameters: QueryParams,
-  t?: any
-): Promise<FetchedData> {
-  const env = await load();
-  console.log(t);
-  const DUNE_API_KEY = t || env['DUNE_API_KEY'];
-  const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
+Deno.test('new test', () => {
+  const queryId = 2034748;
+  const addressFieldName = 'Winner';
+  const queryParameters: QueryParams = {};
 
-  const formattedData: FetchedData = {};
+  getDuneData(queryId, addressFieldName, queryParameters)
+    .then((data) => {
+      console.log(`here with the data! ${JSON.stringify(data)}`);
+    })
+    .catch((e) => {
+      console.log(`here with the error! ${e}`);
+    });
+});
 
-  try {
-    const duneData = await duneAnalyticsProvider.dune(queryId, queryParameters);
-    for (const row of duneData) {
-      formattedData[row[addressFieldName]] = 1;
-    }
-    if (formattedData.undefined) throw DuneErrorFactory.createError(101);
-  } catch (error) {
-    console.log(`here i am`);
-    throw DuneErrorFactory.createError(error.status, error.url);
-  }
-  return formattedData;
-}
+// async function getDuneData(): Promise<FetchedData> {
+//   const env = await load();
+//   const DUNE_API_KEY = t || env['DUNE_API_KEY'];
+//   const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
+//   const dailyAuctionData = await duneAnalyticsProvider.executeQuery(
+//     queryId,
+//     queryParameters
+//   );
+
+//   const duneEthAddressColumn = 'Winner 1';
+//   const formattedData: FetchedData = {};
+
+//   for (const row of dailyAuctionData) {
+//     formattedData[row[duneEthAddressColumn]] = 1;
+//   }
+
+//   if (formattedData.undefined) {
+//     throw DuneErrorFactory.createError(102);
+//   }
+
+//   return formattedData;
+// }
+
+// async function runQuery(
+//   queryId: number,
+//   addressFieldName: string,
+//   queryParameters: QueryParams,
+//   t?: any
+// ): Promise<FetchedData> {
+//   const env = await load();
+//   console.log(t);
+//   const DUNE_API_KEY = t || env['DUNE_API_KEY'];
+//   const duneAnalyticsProvider = new DuneAnalyticsProvider(DUNE_API_KEY);
+//   const formattedData: FetchedData = {};
+
+//   try {
+//     const duneData = await duneAnalyticsProvider.executeQuery(
+//       queryId,
+//       queryParameters
+//     );
+
+//     for (const row of duneData) {
+//       formattedData[row[addressFieldName]] = 1;
+//     }
+//     if (formattedData.undefined) throw DuneErrorFactory.createError(101);
+//   } catch (error) {
+//     console.log(`here i am`);
+//     throw DuneErrorFactory.createError(error.status, error.url);
+//   }
+//   return formattedData;
+// }

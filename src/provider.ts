@@ -35,10 +35,31 @@ export class DuneAnalyticsProvider {
     await this.getExecutionStatus(execution_id);
 
     const results = await this.getResults(execution_id);
+    console.log(results.result.metadata.total_row_count);
 
     const { rows }: Rows = results.result;
 
     return rows;
+  }
+
+  public async executeQueryCount(
+    queryId: number,
+    queryParams?: QueryParams
+  ): Promise<number> {
+    const { execution_id, state } = await this.executeNewQuery(
+      queryId,
+      queryParams
+    );
+
+    console.log(
+      `dune_execution_id is ${execution_id} intial state is ${state}`
+    );
+
+    await this.getExecutionStatus(execution_id);
+
+    const results = await this.getResults(execution_id);
+    console.log(results.result.metadata.total_row_count);
+    return results.result.metadata.total_row_count;
   }
 
   async getExecutionStatus(executionId: string): Promise<string> {
